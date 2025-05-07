@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>이미지 업로드 테스트</title>
+</head>
+<body>
+<h2>이미지 업로드 및 다운로드 테스트</h2>
+<input type="file" id="imageInput" />
+<button onclick="uploadImage()">업로드</button>
+
+<p id="result"></p>
+
+<script>
+    async function uploadImage() {
+        const fileInput = document.getElementById('imageInput');
+        const file = fileInput.files[0];
+        if (!file) {
+            alert("이미지를 선택하세요!");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetch("http://localhost:8080/api/image/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) throw new Error("업로드 실패");
+
+            const data = await response.json();
+            document.getElementById("result").innerHTML = `
+                    ✅ 업로드 성공!<br>
+                    파일 이름: ${data.filename}<br>
+                    <a href="http://localhost:8080${data.downloadUrl}" download>압축 이미지 다운로드</a>
+                `;
+        } catch (err) {
+            alert("에러 발생: " + err);
+        }
+    }
+</script>
+</body>
+</html>
